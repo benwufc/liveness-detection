@@ -22,9 +22,9 @@ def calc_hist(img):
 
 
 ap = argparse.ArgumentParser()
-ap.add_argument("-n", "--name", required=True, help="name of trained model to perform spoofing detection")
+#ap.add_argument("-n", "--name", required=True, help="name of trained model to perform spoofing detection")
 ap.add_argument("-d", "--device", required=True, help="camera identifier/video to acquire the image")
-ap.add_argument("-t", "--threshold", required=False, help="threshold used for the classifier to decide between genuine and a spoof attack")
+#ap.add_argument("-t", "--threshold", required=False, help="threshold used for the classifier to decide between genuine and a spoof attack")
 args = vars(ap.parse_args())
 
 if __name__ == "__main__":
@@ -32,7 +32,8 @@ if __name__ == "__main__":
     # # Load model
     clf = None
     try:
-        clf = joblib.load(args["name"])
+        #clf = joblib.load(args["name"])
+        clf = joblib.load('trained_models/print-attack_trained_models/print-attack_ycrcb_luv_extraTreesClassifier.pkl')
     except IOError as e:
         print "Error loading model <"+args["name"]+">: {0}".format(e.strerror)
         exit(0)
@@ -53,7 +54,7 @@ if __name__ == "__main__":
     # cap.set(cv2.CAP_PROP_AUTOFOCUS, 1)
 
     # # Initialize face detector
-    cascPath = "haarcascade_frontalface_default.xml"
+    cascPath = "python_scripts/haarcascade_frontalface_default.xml"
     faceCascade = cv2.CascadeClassifier(cascPath)
 
     sample_number = 1
@@ -98,7 +99,7 @@ if __name__ == "__main__":
             print measures, np.mean(measures)
             if 0 not in measures:
                 text = "True"
-                if np.mean(measures) >= 0.7:
+                if np.mean(measures) >= 0.3:
                     text = "False"
                     font = cv2.FONT_HERSHEY_SIMPLEX
                     cv2.putText(img=img_bgr, text=text, org=point, fontFace=font, fontScale=0.9, color=(0, 0, 255),
@@ -116,4 +117,5 @@ if __name__ == "__main__":
             break
 
     cap.release()
+    cv2.waitKey(0)
     cv2.destroyAllWindows()
