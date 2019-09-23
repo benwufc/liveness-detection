@@ -1,12 +1,15 @@
 import numpy as np
 import cv2
+from configparser import ConfigParser
 from sklearn.externals import joblib
 #import argparse
 # from time import gmtime, strftime
+config = ConfigParser()
+config.read('python_scripts/main-script.config')
+path = config['path']
 
-#using imread image has some treble in this function, need to check!!!
 def detect_face(img, faceCascade):
-    faces = faceCascade.detectMultiScale(img, scaleFactor=1.1, minNeighbors=5, minSize=(110, 110)
+    faces = faceCascade.detectMultiScale(img, scaleFactor=1.1, minNeighbors=5, minSize=(30,30)
         #flags = cv2.CV_HAAR_SCALE_IMAGE
     )
     return faces
@@ -33,7 +36,7 @@ if __name__ == "__main__":
     clf = None
     try:
         #clf = joblib.load(args["name"])
-        clf = joblib.load('trained_models/print-attack_trained_models/print-attack_ycrcb_luv_extraTreesClassifier.pkl')
+        clf = joblib.load(path['liveness-model'])
     except IOError as e:
         print "Error loading model <"+args["name"]+">: {0}".format(e.strerror)
         exit(0)
@@ -53,7 +56,7 @@ if __name__ == "__main__":
 #    # cap.set(cv2.CAP_PROP_AUTOFOCUS, 1)
 
     # # Initialize face detector
-    cascPath = "python_scripts/haarcascade_frontalface_default.xml"
+    cascPath = path['face-detect']
     faceCascade = cv2.CascadeClassifier(cascPath)
 
     sample_number = 1
@@ -63,7 +66,7 @@ if __name__ == "__main__":
     while test_idx == 0:
         test_idx = 1
         #ret, img_bgr = cap.read()
-        img_bgr = cv2.imread("python_scripts/test.jpg")
+        img_bgr = cv2.imread(path['img-RGB'])
         img_bgr = cv2.resize(img_bgr, (320, 240), interpolation=cv2.INTER_CUBIC)
         print "image shape: ", img_bgr.shape
         print "image type: ", type(img_bgr)
@@ -113,7 +116,7 @@ if __name__ == "__main__":
                     cv2.putText(img=img_bgr, text=text, org=point, fontFace=font, fontScale=0.9,
                                 color=(0, 255, 0), thickness=2, lineType=cv2.LINE_AA)
 
-                f = open("result.txt", "w")
+                f = open(path['liveness-detect-result'], "w")
                 f.write(text)
                 f.close()
 
